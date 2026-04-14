@@ -9,11 +9,11 @@ int main(void)
 	{
 		if (!(PIND &= (1 << 2))) // check with an inverted AND so we can check if the button is pressed
 		{
-			PINB |= (1 << 0);
+			PINB |= (1 << 0); // turn on the led
 		}
 		else
 		{
-			PINB |= (0 << 0);
+			PINB |= (0 << 0); // turn off the led
 		}
 	}
 }

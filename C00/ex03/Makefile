@@ -8,7 +8,7 @@ SRC = main.c
 all: hex flash
 
 hex:
-		avr-gcc -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os  -c $(SRC) -o main.o
+		avr-gcc -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -c $(SRC) -o main.o
 		avr-gcc -mmcu=$(MCU) -e main main.o -o $(BIN)
 		avr-objcopy -O ihex $(BIN) $(HEX)
 
