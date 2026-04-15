@@ -13,19 +13,5 @@ int main(void)
 	ICR1 = (F_CPU / 256) - 1; // et ici on divise la frequence du cpu par 256 pour avoir lequivalent de 1sec, puis on divise par 2 pour la demi sec et -1 pour le overflow
 	OCR1A = ((F_CPU / 256) -1) /10; // notre match a 10%
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	while(1) {}
 }
