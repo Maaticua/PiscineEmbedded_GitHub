@@ -12,13 +12,20 @@ void uart_init( unsigned int ubrr)
 {
 	UBRR0H = (unsigned char)(ubrr>>8);  //setup le baudrate high | p185
 	UBRR0L = (unsigned char)ubrr;  // setup le baudrate low      | bauderate separer en deux car cest une valeur 12bits p185
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1 << RXCIE0); // on active le recepteur RXENO pour recevoir des donnees et le recepteur TXENO pour en emettre p185
+	UCSR0B = (1<<RXEN0)|(1<<TXEN0); // on active le recepteur RXENO pour recevoir des donnees et le recepteur TXENO pour en emettre p185
 }
 
 void uart_tx(char c)
 {
 	while (!( UCSR0A & (1<<UDRE0))) {} // indicateur pour savoir si le tampon est vide et est pret a recevoir un nouveau character p186
 	UDR0 = c;
+}
+
+char uart_rx(void)
+{
+	while ( !(UCSR0A & (1<<RXC0)) ) // attend de recevoir de la data
+					;
+	return UDR0; // retourne ce qu'il recoit
 }
 
 void USART_RX_vect(void)
@@ -34,44 +41,71 @@ void uart_printstr(const char* str)
 		uart_tx(str[i++]);
 }
 
-uint8_t Username_check(char *username)
+uint8_t check_UserNdPass(char *UserOrPass)
 {
-	uint8_t isUsernameGood = 0;
+	uint8_t i = 0;
+	uint8_t isGood = 1;
+	char c;
 
-	/* check du username bit par bit pour eviter une allocation de char* pour comparer */
-
-	uart_printstr("\r\n\tpassword:");
-	return (isUsernameGood);
-}
-uint8_t Password_check(char *password)
-{
-	uint8_t isPasswordGood = 0;
-
-	/* check du password bit par bit pour eviter une allocation de char* pour comparer */
-
-	return(isPasswordGood);
+	while (1)
+	{
+		c = uart_rx();
+		if (c == '\r' || c == '\n')
+		{
+			uart_printstr("\r\n");
+			if (UserOrPass[i] != '\0')
+			{
+				isGood = 0;
+			}
+			return (isGood);
+		}
+		else if (c == '\b')
+		{
+			if (i > 0)
+			{
+				i--;
+				uart_printstr("\b \b");
+			}
+		}
+		else
+		{
+			if (UserOrPass[i] == '\0' || c != UserOrPass[i])
+				isGood = 0;
+		}
+		i++;
+	}
 }
 
 int main()
 {
 	uart_init(MYUBRR);// on initialise L'UART p184
-	uint8_t areBothGood = 0;
-
 	char *username = "macaruan";
 	char *password = "banana";
 
-	uart_printstr("Enter your login:\r\n\tusername:");
+	uint8_t isUserGood = 1;
+	uint8_t isPassGood = 1;
 
-	areBothGood = Username_check(username);
-	areBothGood = Password_check(password);
+	while (1)
+	{
+		uart_printstr("Enter your login:\r\n\tusername: ");
+		isUserGood = check_UserNdPass("macaruan");
+		uart_printstr("\tpassword: ");
+		isPassGood = check_UserNdPass("banana");
 
-	if (!areBothGood)
-		uart_printstr("\rBad combinasion username/password\r\n");
-	else
-		uart_printstr("\rHello macaruan\r\n");
-
-
-	SREG |= (1 << 7); // interupeur global
-
-	while (1) {}
+		if (isUserGood && isPassGood)
+		{
+			uart_printstr("\rHello macaruan!\r\nShall we play a game?\r\n");
+			DDRB |= (1 << PB5)
+			for (uint8_t i = 0; i < 8; i++)
+			{
+				PORTB ^= (1 << PB5);
+				_delay_ms(50);
+			}
+		}
+		else
+		{
+			uart_printstr("\rBad combination username/password\r\n");
+		}
+		// SREG |= (1 << 7); // interupeur global
+	}
 }
