@@ -19,12 +19,17 @@ void uart_tx(char c)
 	UDR0 = c;
 
 }
+char uart_rx(void)
+{
+	while ( !(UCSR0A & (1<<RXC0)) ) // attend de recevoir de la data
+					;
+	return UDR0; // retourne ce qu'il recoit
+}
 int main()
 {
 	uart_init(MYUBRR); // on initialise L'UART p184
 	while (1)
 	{
-		uart_tx('Z');
-		_delay_ms(1000);
+		uart_tx(uart_rx()); // on ecrit ce au'on retourne
 	}
 }
