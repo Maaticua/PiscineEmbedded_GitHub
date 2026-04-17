@@ -3,8 +3,8 @@
 #include <avr/interrupt.h>
 
 #define FOSC 16000000 // Clock Speed
-#define BAUD 115200
-#define MYUBRR FOSC/16/BAUD
+#define BAUD 115200 // baud rate
+#define MYUBRR FOSC/16/BAUD // calcul pour synchroniser la board et le pc
 
 void uart_init( unsigned int ubrr)
 {

@@ -4,9 +4,9 @@
 
 #define FOSC 16000000 // Clock Speed
 #define BAUD 115200
-#define MYUBRR FOSC/16/BAUD
+#define MYUBRR FOSC/16/BAUD  // calcul pour synchroniser la board et le pc
 
-void TIMER1_COMPA_vect(void) __attribute__((signal));
+void TIMER1_COMPA_vect(void) __attribute__((signal)); // on declare un vecteur d'interuption et on ajoute des instruction speciale au compilateur, 1er sauvgarder letat et 2e reti p74
 
 void uart_init( unsigned int ubrr)
 {
@@ -24,7 +24,7 @@ void uart_printstr(const char* str)
 {
 	uint8_t i = 0;
 	while (str[i])
-		uart_tx(str[i++]);
+		uart_tx(str[i++]); // on boucle pour ecrire character pas character
 }
 void TIMER1_COMPA_vect(void)
 {

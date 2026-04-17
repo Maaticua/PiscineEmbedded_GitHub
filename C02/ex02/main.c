@@ -4,7 +4,7 @@
 
 #define FOSC 16000000 // Clock Speed
 #define BAUD 115200
-#define MYUBRR FOSC/16/BAUD
+#define MYUBRR FOSC/16/BAUD  // calcul pour synchroniser la board et le pc
 
 void uart_init( unsigned int ubrr)
 {
