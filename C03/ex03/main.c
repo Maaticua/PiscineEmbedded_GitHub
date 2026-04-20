@@ -25,11 +25,11 @@ void uart_init( unsigned int ubrr)
 
 void init_rgb()
 {
-	TCCR0A |= (1 << COM0A1) | (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
-	TCCR0B |= (1 << CS00);
+	TCCR0A |= (1 << COM0A1) | (1 << COM0B1) | (1 << WGM01) | (1 << WGM00); //on active le fast PWM avec WGM00 et WGM01 a 1 et le Clear Compare match pour COM0A1 et COM0B1 p113
+	TCCR0B |= (1 << CS00); // on choisi No prescaling p116
 
-	TCCR2A |= (1 << COM2B1)| (1 << WGM21) | (1 << WGM20);
-	TCCR2B |= (1 << CS20);
+	TCCR2A |= (1 << COM2B1)| (1 << WGM21) | (1 << WGM20); //on active le fast PWM avec WGM20 et WGM21 a 1 et le Clear Compare match pour COM2B1 p162
+	TCCR2B |= (1 << CS20); // on choisi No prescaling p165
 }
 
 void uart_tx(char c)
@@ -67,15 +67,15 @@ uint8_t check_color()
 {
 	char c = uart_rx();
 
-	if (c == '#')
+	if (c == '#') // si c'est le debut du format hexa
 	{
-		uart_tx(c);
+		uart_tx(c); // affichage du '#'
 
 		char buffer[6];
 		for (uint8_t i = 0; i < 6; i++)
 		{
-			buffer[i] = uart_rx();
-			uart_tx(buffer[i]);
+			buffer[i] = uart_rx(); // lit les 6 char
+			uart_tx(buffer[i]); // on les affiches
 		}
 		OCR0B = (hex_to_int(buffer[0]) << 4) | hex_to_int(buffer[1]);
 		OCR0A = (hex_to_int(buffer[2]) << 4) | hex_to_int(buffer[3]);
@@ -95,7 +95,7 @@ int main(void)
 
 	while (1)
 	{
-		uart_printstr("Enter Hex RGB color format [#RRGGBB]: ");
+		uart_printstr("\r\nEnter Hex RGB color format [#RRGGBB]: ");
 		check_color();
 	}
 }
