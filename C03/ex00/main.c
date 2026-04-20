@@ -2,9 +2,9 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#define LED (1 << PD3) | (1 << PD5) | (1 << PD6)
+#define LED (1 << PD3) | (1 << PD5) | (1 << PD6) // simplifie l'initialisation des leds
 
-#define RED (1 << PD5)
+#define RED (1 << PD5) //                des defines pour rendre les couleur plus lisible
 #define GREEN (1 << PD6)
 #define BLUE (1 << PD3)
 #define YELLOW (RED | GREEN)
@@ -15,20 +15,20 @@
 
 int main(void)
 {
-	DDRD |= LED;
+	DDRD |= LED; // initialisation des led
 
 	while (1)
 	{
-		PORTD ^= RED;
-		_delay_ms(1000);
-		PORTD ^= RED;
+		PORTD ^= RED; // inverse l'etat de la led avec un XOR
+		_delay_ms(1000); // delay de 1sec
+		PORTD ^= RED; // inverse l'etat de la led avec un XOR
 
-		PORTD ^= GREEN;
-		_delay_ms(1000);
-		PORTD ^= GREEN;
+		PORTD ^= GREEN; // inverse l'etat de la led avec un XOR
+		_delay_ms(1000);// delay de 1sec
+		PORTD ^= GREEN; // inverse l'etat de la led avec un XOR
 
-		PORTD ^= BLUE;
-		_delay_ms(1000);
-		PORTD ^= BLUE;
+		PORTD ^= BLUE; // inverse l'etat de la led avec un XOR
+		_delay_ms(1000);// delay de 1sec 
+		PORTD ^= BLUE; // inverse l'etat de la led avec un XOR
 	}
 }
