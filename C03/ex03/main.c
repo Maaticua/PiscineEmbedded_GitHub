@@ -55,11 +55,11 @@ void uart_printstr(const char* str)
 uint8_t hex_to_int(char c)
 {
 	if (c >= '0' && c<= '9')
-		return c - '0';
+		return c - '0'; // si entre 0 et 9 on soustrait 48 pour la transformer en decimal. ex '5' = 53 - 48 = 5 (valeur en decimal)
 	if (c >= 'A' && c<= 'F')
-		return c - 'A' + 10;
+		return c - 'A' + 10; // si entre 'A' et 'F' on soustrait 65 et on ajoute 10 pour la valeur en hexa: ex 'C' = 67 - 65 = 2 + 10 = 12, 12 = C en hexa
 	if (c >= 'a' && c <= 'f')
-		return c - 'a' + 10;
+		return c - 'a' + 10; // meme chose que en haut mais avec les minuscules
 	return 0;
 }
 
