@@ -52,6 +52,11 @@ void uart_printstr(const char* str)
 		uart_tx(str[i++]); //ecrit ce qu'il recoit char par char
 }
 
+uint8_t is_hex(char c)
+{
+	return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')); // check si c'est un char en Hexadecimal
+}
+
 uint8_t hex_to_int(char c)
 {
 	if (c >= '0' && c<= '9')
@@ -70,16 +75,34 @@ uint8_t check_color()
 	if (c == '#') // si c'est le debut du format hexa
 	{
 		uart_tx(c); // affichage du '#'
-
 		char buffer[6];
+		uint8_t is_valid = 1;
+
 		for (uint8_t i = 0; i < 6; i++)
 		{
-			buffer[i] = uart_rx(); // lit les 6 char
+			buffer[i] = uart_rx(); // lit et stock les 6 char
 			uart_tx(buffer[i]); // on les affiches
+
+			if (!is_hex(buffer[i]))
+			{
+				is_valid = 0; // on check si c'est un char
+			}
 		}
-		OCR0B = (hex_to_int(buffer[0]) << 4) | hex_to_int(buffer[1]);
-		OCR0A = (hex_to_int(buffer[2]) << 4) | hex_to_int(buffer[3]);
-		OCR2B = (hex_to_int(buffer[4]) << 4) | hex_to_int(buffer[5]);
+		if (is_valid)
+		{
+
+			//ici petit calcule, ex on recoit A50000, on prend le premier char 'A', on le transforme en decimal = 10. ensuite un x16 car hex en base 16 donc 160 et ensuite on rajoute l'unite +5 qui a ete transformer en decimal
+			uint8_t r = (hex_to_int(buffer[0]) * 16) + hex_to_int(buffer[1]); //on regle le rouge,
+			OCR0B = r;
+			uint8_t g = (hex_to_int(buffer[2]) * 16) + hex_to_int(buffer[3]); // on regle le vert
+			OCR0A = g;
+			uint8_t b = (hex_to_int(buffer[4]) * 16) + hex_to_int(buffer[5]); // on regle le bleu
+			OCR2B = b;
+		}
+		else
+		{
+			uart_printstr("\r\ninvalide Hexa string\r\n");
+		}
 	}
 	else
 	{
