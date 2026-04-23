@@ -3,32 +3,34 @@
 #include <avr/interrupt.h>
 
 #define BAUD 115200 // vitesse de com entre board et pc
+#define UP 0
+#define DOWN 1
 
 void TIMER0_COMPA_vect(void) __attribute__((signal)); // on declare un vecteur d'interuption et on ajoute des instruction speciale au compilateur, 1er sauvgarder letat et 2e reti p74
 
 void TIMER0_COMPA_vect(void)
 {
 	static uint8_t Up_Down = 0; // on  fait un bool pour savoir si on monte ou descend
-	if (Up_Down == 0)
+	if (Up_Down == 0) // check de si on doit monter ou descendre
 	{
-		if (OCR1A == 255)
+		if (OCR1A == 255) // on check d'abbord si on a attein la limite max
 		{
-			Up_Down = 1;
+			Up_Down = DOWN; // si oui on passe la variable a 1
 		}
 		else
 		{
-			OCR1A++;
+			OCR1A++; // sinon on incremente
 		}
 	}
-	else if (Up_Down == 1)
+	else if (Up_Down == 1) // check de si on doit monter ou descendre
 	{
-		if (OCR1A == 0)
+		if (OCR1A == 0) // on check d'abbord si on a attein la limite min
 		{
-			Up_Down = 0;
+			Up_Down = UP; // si oui on passe la variable a 0
 		}
 		else
 		{
-			OCR1A--;
+			OCR1A--; // sinon on decremente
 		}
 	}
 }

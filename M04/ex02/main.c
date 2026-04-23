@@ -11,20 +11,24 @@ void INT0_vect(void) __attribute__((signal)); // on declare un vecteur d'interup
 
 void INT0_vect(void)
 {
-	static uint8_t state = 1;
-	state = !state;
-
-	if (state == 0 &&counter < 15)
+	if (TCNT1 > (((F_CPU / 256) * 5) / 100))
 	{
-		counter++;
-		if (counter < 8) // if under 8 we can assigne portb to the counter value for the led to turn on
+		static uint8_t state = 1; // on cree une variable pour initialiser letat reel du boutton
+		state = !state; //on inverse l'etat du btton
+
+		if (state == 0 && counter < 15)
 		{
-			PORTB = counter; // we turn on the led, ex : if counter = 4 = 0100 the 3th led turn on
+			counter++;
+			if (counter < 8) // if under 8 we can assigne portb to the counter value for the led to turn on
+			{
+				PORTB = counter; // we turn on the led, ex : if counter = 4 = 0100 the 3th led turn on
+			}
+			else
+			{
+				PORTB = (counter % 8) | (1 << 4); // above 8 we need to do the modulo of counter by 8, so for exemple we have 11 % 8 = 3 = 0011 so we turn on the first two led and afer that we manualy turn on the 4th led
+			}
 		}
-		else
-		{
-			PORTB = (counter % 8) | (1 << 4); // above 8 we need to do the modulo of counter by 8, so for exemple we have 11 % 8 = 3 = 0011 so we turn on the first two led and afer that we manualy turn on the 4th led
-		}
+		TCNT1 = 0; // on reset le timer
 	}
 
 }
@@ -33,20 +37,24 @@ void PCINT2_vect(void) __attribute__((signal)); // on declare un vecteur d'inter
 
 void PCINT2_vect(void)
 {
-	static uint8_t state = 1;
-	state = !state;
-
-	if (state == 0 && counter > 0)
+	if (TCNT1 > (((F_CPU / 256) * 5) / 100))
 	{
-		counter--;
-		if (counter < 8) // if under 8 we can assigne portb to the counter value for the led to turn on
+		static uint8_t state = 1; // on cree une variable pour initialiser letat reel du boutton
+		state = !state; //on inverse l'etat du btton
+
+		if (state == 0 && counter > 0)
 		{
-			PORTB = counter; // we turn on the led, ex : if counter = 4 = 0100 the 3th led turn on
+			counter--;
+			if (counter < 8) // if under 8 we can assigne portb to the counter value for the led to turn on
+			{
+				PORTB = counter; // we turn on the led, ex : if counter = 4 = 0100 the 3th led turn on
+			}
+			else
+			{
+				PORTB = (counter % 8) | (1 << 4); // above 8 we need to do the modulo of counter by 8, so for exemple we have 11 % 8 = 3 = 0011 so we turn on the first two led and afer that we manualy turn on the 4th led
+			}
 		}
-		else
-		{
-			PORTB = (counter % 8) | (1 << 4); // above 8 we need to do the modulo of counter by 8, so for exemple we have 11 % 8 = 3 = 0011 so we turn on the first two led and afer that we manualy turn on the 4th led
-		}
+		TCNT1 = 0; // on reset le timer
 	}
 
 }
@@ -65,6 +73,9 @@ int main()
 	PORTD |= (1 << PD4); // on active la resistance de pull up
 	PCICR |= (1 << PCIE2); // on active le pin change interup cpntrol register pour activer le groupe de PD4 (PCINT20) p82
 	PCMSK2 |= (1 << PCINT20); // permet de cibler la broche du switch2 p20
+
+	TCCR1B |= (1 << CS12); // prescaleur de 256
+	TCNT1 = 0; // initialisation du timer a 0
 
 	SREG |= (1 << 7); // interuption globale
 
