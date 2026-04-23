@@ -50,51 +50,51 @@ void	uart_puthexu8nbr(uint8_t n)
 	uart_tx(hex[n % 16]);
 }
 
-void	uart_putdecistr(uint8_t n)
+void	uart_putdecistr(uint16_t n)
 {
 	char* hex = "0123456789";
 
 	if (n >= 10)
 	{
-		uart_puthexu8nbr(n / 10);
+		uart_putdecistr(n / 10);
 	}
 	uart_tx(hex[n % 10]);
 }
 
 int main(void)
 {
-	uint8_t i = 0;
+	uint16_t i = 0;
 	uart_init(MYUBRR);// on initialise L'UART p184
 
 	ADCSRA |= (1 << ADEN) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2); // on allume l'ADC avec ADEN p258 et on setup l'horloge de l'ADC p258 et https://marcjuneau.ca/?p=112
-	ADMUX |= (1 << REFS0); // on active l'AVCC p257
+	ADMUX |= (1 << REFS0); // on active l'AVCC (le tension de reference) p257
 
 	while(1)
 	{
-		ADMUX &= ~((1 << MUX0) | (1 << MUX1) | (1 << MUX2));
+		ADMUX &= ~((1 << MUX0) | (1 << MUX1) | (1 << MUX2)); // on met tout a 0 tout le potentiometre
 		// potentiometre
 		ADCSRA |= (1 << ADSC); // on active l'ADC Start Conversion p258
 		while (ADCSRA & (1 << ADSC)){} // on attend la fin de la convertion p258
-		i = ADCH;
-		uart_printstr("i");
+		i = ADC;
+		uart_putdecistr(i);
 		uart_printstr(", ");
 
 		// lumiere
-		ADMUX &= ~((1 << MUX1) | (1 << MUX2));
-		ADMUX |= (1 << MUX0);
+		ADMUX &= ~((1 << MUX1) | (1 << MUX2)); // on force mux1 et mux2 a 0 pour la photoresistance
+		ADMUX |= (1 << MUX0); // on force mux0 a 1 pour la photoresistance
 		ADCSRA |= (1 << ADSC); // on active l'ADC Start Conversion p258
 		while (ADCSRA & (1 << ADSC)){} // on attend la fin de la convertion p258
-		i = ADCH;
-		uart_printstr(i);
+		i = ADC;
+		uart_putdecistr(i);
 		uart_printstr(", ");
 
 		// temperature
-		ADMUX &= ~((1 << MUX0) | (1 << MUX2));
-		ADMUX |= (1 << MUX1);
+		ADMUX &= ~((1 << MUX0) | (1 << MUX2)); // on force mux0 et mux2 a 0 pour la photoresistance
+		ADMUX |= (1 << MUX1);  // on force mux1 a 1 pour la photoresistance
 		ADCSRA |= (1 << ADSC); // on active l'ADC Start Conversion p258
 		while (ADCSRA & (1 << ADSC)){} // on attend la fin de la convertion p258
-		i = ADCH;
-		uart_printstr(i);
+		i = ADC;
+		uart_putdecistr(i);
 		uart_printstr("\r\n");
 		_delay_ms(20);
 	}
