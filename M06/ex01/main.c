@@ -113,26 +113,26 @@ int main(void)
 {
 	uart_init(MYUBRR); // initialisation de l'UART
 	i2c_init(); // on initialise le protocole I2C
-	uint16_t i; // je cree un variable pour stocker le status
 
 	while(1)
 	{
-		i2c_start(); // on lance norte I2C
-		i2c_write((0x38 << 1) | 0); // on vient choisir une adress, ici 0x38 est l'adresse du capteur AHT20 et un set 0 pour qu'il puisse ecrire p12 de https://datasheet4u.com/pdf/1551700/AHT20.pdf
+		i2c_start(); // prise de controle du bus i2c
+		i2c_write((0x38 << 1) | 0); // on vient choisir une adress, ici 0x38 est l'adresse du capteur AHT20 et on decale dun bit vers la gauche et on set 0 pour qu'il puisse ecrire p12 de https://datasheet4u.com/pdf/1551700/AHT20.pdf
 
-		i2c_write(0xAC);
-		i2c_write(0x33);
-		i2c_write(0x00);
+		// on envoi la commande trigger mesurment et ses deux parametre p12 https://datasheet4u.com/pdf/1551700/AHT20.pdf
+		i2c_write(0xAC); // octet de commande principal
+		i2c_write(0x33); // param 1
+		i2c_write(0x00); // param2
 
-		i2c_stop(); // on stop notre I2C
+		i2c_stop(); // liberation du bus pour laisser le capteur travailler
 
-		_delay_ms(80);
+		_delay_ms(80); // on laisse 80ms au capteur (preconisation constructeur) p12
 
-		i2c_start();
+		i2c_start(); // nouvelle prise de controle pour lire la reponse
 		i2c_write((0x38 << 1) | 1);  // on vient choisir une adress, ici 0x38 est l'adresse du capteur AHT20 et un set 1 pour qu'il puisse lire p12 de https://datasheet4u.com/pdf/1551700/AHT20.pdf
 		for (uint16_t i = 0; i < 7; i++)
-			i2c_read();
-		i2c_stop();
+			i2c_read(); // on lit l'octet, envoi le signal ACK et affiche
+		i2c_stop(); // fin de la commuication
 		uart_printstr("\r\n");
 		_delay_ms(1000);
 	}
