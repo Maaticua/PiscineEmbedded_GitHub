@@ -99,5 +99,5 @@ int main(void)
 	uart_printstr("\r\n"); // retour a la ligne
 	uart_printstr("Stop\r\n"); // j'affiche que je vais faire un stop pour la lisibiliter
 	i2c_stop(); // on stop notre I2C
-	uart_printstr("he stoped \r\n"); // ligne de debugage
+	//uart_printstr("he stoped \r\n"); // ligne de debugage
 }
